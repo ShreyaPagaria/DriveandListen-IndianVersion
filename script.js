@@ -8,6 +8,14 @@ const audio = document.getElementById('music');
 const play = document.getElementById('play');
 const prev= document.getElementById('prev');
 const next = document.getElementById('next');
+const loading = document.getElementById('loading');
+
+var currentCityIndex;
+var currentCity;
+var currentVideoIndex;
+var currentVideo;
+var currentAudioIndex;
+var currentAudio;
 
 
 const data = [
@@ -182,28 +190,26 @@ const data = [
 
 const availableSpeeds = [0.5, 1, 1.5, 2];
 
-var currentCityIndex;
-var currentCity;
-var currenVideoIndex;
-var currentVideo;
-var currentAudioIndex;
-var currentAudio;
+
+// onload()
 
 function onload() {
   //city
-  currentCityIndex = randomNum(data.length);
+  currentCityIndex = randomNumber(data.length);
   currentCity = data[currentCityIndex];
 
   //video
-  currenVideoIndex = randomNum(currentCity.videos.length);
-  currentVideo = currentCity.videos[currenVideoIndex];
+  currentVideoIndex = randomNumber(currentCity.videos.length);
+  currentVideo = currentCity.videos[currentVideoIndex];
 
   //audio of that particular city
-  currentAudioIndex = randomNum(currentCity.music.length);
+  currentAudioIndex = randomNumber(currentCity.music.length);
   currentAudio = currentCity.music[currentAudioIndex];
 
   //we need to send the all of these to the DOM
+  // console.log(currentCity);
   console.log(currentAudio);
+  // console.log(currentVideo);
   audio.src = currentAudio;
   audio.volume = 0.5;
   play.classList.remove('fa-play');
@@ -213,11 +219,11 @@ function onload() {
     var locationElement = document.createElement('li');
     locationElement.innerText = el.city;
     locationElement.id = idx;
-    locationElement.addEventListener('click', (e)=>{
+    locationElement.addEventListener('click', ()=>{
       currentCityIndex = Number(e.target.id);
       currentCity = data[currentCityIndex];
-      currenVideoIndex = randomNum(currentCity.videos.length);
-      currentVideo = currentCity.videos[currenVideoIndex];
+      currentVideoIndex = randomNum(currentCity.videos.length);
+      currentVideo = currentCity.videos[currentVideoIndex];
       currentAudioIndex = randomNum(currentCity.music.length);
       currentAudio = currentCity.music[currentAudioIndex];
 
@@ -229,12 +235,15 @@ function onload() {
     })
 
     locations.append(locationElement)
+    // highlight()
   })
+  
+
   availableSpeeds.forEach((el,idx)=> {
-    var speedEL = document.createElement('p');
-    speedEL.id = el;
-    speedEL.innerText = el + 'x';
-    speedEL.addEventListener('click', (e)=> {
+    var speedEl = document.createElement('p');
+    speedEl.id = el;
+    speedEl.innerText = el + 'x';
+    speedEl.addEventListener('click', (e)=> {
       player.setPlaybackRate(Number(e.target.id))
     })
     speed.append(speedEl)
@@ -245,15 +254,15 @@ function onload() {
 function highlight(){
   console.log(locations.childNodes)
   locations.childNodes.forEach((el, idx) => {
-    el.remove('active');
+    el.classList.remove('active');
     if(idx == currentCityIndex){
-      el.classList.add('active')
+      el.classList.add('active');
     }  
   })
 
 }
 
-function randomNum(max){
+function randomNumber(max){
   return Math.floor(Math.random() *(max))
 }
 
@@ -270,30 +279,48 @@ play.addEventListener('click', ()=> {
   }
 })
 
-//for the prev button
-prev.addEventListener('click', ()=>{
-  if(currentAudioIndex > 0){
-    currentAudioIndex--;
-  }else{
-    currentAudioIndex = currentCity.audio.length - 1;
-  }
-
-  currentAudio = currentCity.music[currentAudioIndex];
-  audio.src = currentAudio;
-  audio.play()
-})
 //for the next button 
 next.addEventListener('click', ()=>{
-  if(currentAudioIndex < (currentCity.audio.length - 1)){
-    currentAudioIndex++;
+  if(currentAudioIndex < ((currentCity.music.length) - 1)){
+    currentAudioIndex++
   }else {
     currentAudioIndex = 0
   }
 
   currentAudio = currentCity.music[currentAudioIndex];
   audio.src = currentAudio;
-  audio.play()
+  // audio.play()
 })
+
+//for the prev button
+prev.addEventListener('click', ()=>{
+  if(currentAudioIndex > 0){
+    currentAudioIndex--
+  }
+  else{
+    currentAudioIndex = ((currentCity.music.length) - 1);
+  }
+
+  currentAudio = currentCity.music[currentAudioIndex];
+  audio.src = currentAudio;
+  // audio.play()
+})
+
+mute.addEventListener('click', ()=>{
+  if(player.isMuted()){
+    player.unMute();
+    mute.innerText = 'On'
+  } else{
+    player.mute();
+    mute.innerText = 'Off'
+  }
+})
+
+toggle.addEventListener('click', () =>{
+  document.querySelector('.sidebar').classList.toggle('hide');
+
+})
+
 
 
 // copy pasted this code snippet from youtube IFRAME API documentation!
@@ -341,11 +368,30 @@ function onPlayerReady(event) {
 //    the player should play for six seconds and then stop.
 var done = false;
 function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.PLAYING && !done) {
-    setTimeout(stopVideo, 6000);
-    done = true;
+  if(event.data == YT.PlayerState.ENDED){
+    if(currentVideoIndex < currentCity.videos.length){
+      currentVideoIndex++
+    }else{
+      currentVideoIndex = 0
+    }
+    currentVideo = currentCity.videos[currentVideoIndex];
+    player.loadVideoById({videoId : currentVideo});
+    highlight()
+  }
+
+  if(event.data == YT.PlayerState.BUFFERING){
+    loading.style.display = 'flex'
+  }
+  if (event.data == YT.PlayerState.PLAYING) {
+    // setTimeout(stopVideo, 6000);
+    // done = true;
+    loading.style.display = 'flex';
+    setTimeout(() =>{
+      loading.style.display = 'none'
+    }, 3000);
   }
 }
-function stopVideo() {
-  player.stopVideo();
+
+function changeVolume(e){
+  audio.volume = parseFloat(e.value / 100);
 }
