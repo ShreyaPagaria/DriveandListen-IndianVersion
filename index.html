@@ -11,9 +11,13 @@
 </head>
 <body>
     <!-- <h1> Drive and Vibe</h1> -->
+    <div class="loading" id="loading">Loading...</div>
+    <div class="video-container">
+        <div id="player"></div> 
+
+    </div>
 
     <!-- copying the code snippet from youtube iframe player api -->
-    <div id="player"></div> 
     <!-- creating the sidebar -->
     <div class="sidebar-toggle" id="toggle">
         <i class="fa fa-eye white" id="prev" aria-hidden="true"></i>
@@ -23,11 +27,11 @@
     <div class="sidebar">
         <h2> Drive & Vibe </h2>
         <div class="location-container">
-            <h4> Scroll down for more cities</h4>
+            <h4> Scroll down for more cities </h4>
             <div class="locations">
                 <ul id="locations">
                     <li>Mumbai</li>
-                    <li>Delhi</li>
+                    <li class="active">Delhi</li>
                     <li>Jaipur</li>
                     <li>Guwahati</li>
                     <li>Kolkata</li>
@@ -43,20 +47,25 @@
         </div>
         <!-- Car speed part -->
         <div class="video-speed">
-            <h4>Car speed </h4>
+            <h4> Car speed </h4>
             <div class="speed" id="speed">
+                <!-- <p class="active"> 0.5x </p>
+                <p> 1x </p>
+                <p> 1.5x </p>
+                <p> 2x </p> -->
+
             </div>
         </div>
 
         <!-- mute and unmute -->
         <div class="car-noise">
             <h4> Street Noise </h4>
-            <div class="mute" id="mute">OFF</div>
+            <div class="mute" id="mute">Off</div>
         </div>
 
         <!-- fm radio part -->
         <div class="audio">
-            <h4> Radio audio</h4>
+            <h4> Car audio</h4>
             <div class="audio-controls">
                 <div class="controls">
                     <i class="fa fa-step-backward" id="prev" aria-hidden="true"></i>
@@ -64,7 +73,7 @@
                     <i class="fa fa-step-forward" id="next" aria-hidden="true"></i>
                 </div>
                 <div class="volume">
-                    <input type="range" min="1" max="100" value="50" id="volume">
+                    <input type="range" min="1" max="100" value="50" id="volume" onchange="changeVolume(this)">
                 </div>
             </div>
             <audio id="music" crossorigin autoplay></audio>
