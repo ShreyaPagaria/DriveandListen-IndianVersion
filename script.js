@@ -191,7 +191,7 @@ const data = [
 const availableSpeeds = [0.5, 1, 1.5, 2];
 
 
-// onload()
+onload()
 
 function onload() {
   //city
